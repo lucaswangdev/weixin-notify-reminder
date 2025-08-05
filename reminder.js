@@ -110,6 +110,7 @@ function saveTasks(tasks) {
 function scheduleTask(task) {
   if (scheduledTasks.has(task.id)) {
     scheduledTasks.get(task.id).stop();
+    scheduledTasks.delete(task.id);
   }
 
   const job = cron.schedule(task.cron, async () => {
@@ -121,8 +122,11 @@ function scheduleTask(task) {
       }
       return true;
     });
+  }, {
+    timezone: TIME_ZONE
   });
 
+  job.start();
   scheduledTasks.set(task.id, job);
   console.log(`✅ 任务已调度: ${task.name} (${task.cron})`);
 }
